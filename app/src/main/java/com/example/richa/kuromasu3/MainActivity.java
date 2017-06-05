@@ -29,8 +29,10 @@ import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
 
-    int[][]juego = {{1,2,2}, {1, 1, 1}};
-
+    int[][]juego = {{1,2,0}, {1, 1, 1}};
+    int filas=2;
+    int columnas=3;
+    int matriz[][]= new int[2][3];
 
     //gris=0,negro=1, blanco=2
 
@@ -43,15 +45,12 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        int filas=2;
-        int columnas=3;
-        final int matriz[][]= new int[2][3];
+
 
 
         LinearLayout layoutPrincipal=(LinearLayout) this.findViewById(R.id.principal);
 
         for ( int i = 0; i< filas; i++){
-
             LinearLayout layout = new LinearLayout(this);
 
             layout.setOrientation(LinearLayout.HORIZONTAL);
@@ -64,15 +63,18 @@ public class MainActivity extends AppCompatActivity {
                 final Button b= new Button(this);
                 b.setText(String.valueOf(juego[i][j]));
                 matriz[i][j]=0;
+                if(juego[i][j]!=0){
+
+                    matriz[i][j]=2;
+                    b.setBackgroundColor(Color.WHITE);}
 
 
                 b.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
 
-                        System.out.println("hola2");
-                        imprime(matriz);
-                        if(comprobar(matriz)) System.out.println("Completo");
+
+
 
                         if(matriz[k][p]==0){
                         b.setBackgroundColor(Color.BLACK);
@@ -98,6 +100,28 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+                        if(comprobar(matriz)) {
+
+                            if(Arrays.deepEquals(juego, matriz)){Toast toast1 =
+                                    Toast.makeText(getApplicationContext(),
+                                            "Felicitaciones", Toast.LENGTH_SHORT);
+
+                                toast1.show();
+                                System.out.println("correcto");
+                            }
+
+                            else {Toast toast1 =
+                                    Toast.makeText(getApplicationContext(),
+                                            "Incorrecto", Toast.LENGTH_SHORT);
+
+                            toast1.show();}
+
+                            try {
+                                Pista(juego,matriz);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
 /*
                         for(int h=0;h<2;h++)    {
                             for(int k=0;k<3;k++){System.out.println("matriz 1"+matriz[k][h]+"matriz2"+juego[k][h]);}
@@ -111,7 +135,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-
 // y se añade al layout
                 layout.addView(b);}
             layoutPrincipal.addView(layout);
@@ -122,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
 
 //Termina el Main Activity
 
-
+//Comprueba matriz completa o no, true si es completa
 boolean comprobar(int matriz2[][]) {
     for (int i = 0; i < 2; i++) {    // El primer índice recorre las filas.
         for (int j = 0; j < 3; j++) {    // El segundo índice recorre las columnas.
@@ -136,19 +159,56 @@ boolean comprobar(int matriz2[][]) {
 return true;}
 
 
-    void imprime(int matriz2[][]) {
-        System.out.println("hola");
-        for (int i = 0; i < 2; i++) {    // El primer índice recorre las filas.
-            for (int j = 0; j < 3; j++) {    // El segundo índice recorre las columnas.
-                // Procesamos cada elemento de la matriz.
-                System.out.println("el numero es"+matriz2[i][j]);
-
-            }
-
-        }
-        }
 
 
+
+     void Guardar(int mat[][], int resp[][]){
+
+         for (int i = 0; i < mat.length; i++) {    // El primer índice recorre las filas.
+             for (int j = 0; j < mat[0].length; j++) {    // El segundo índice recorre las columnas.
+                 // Procesamos cada elemento de la matriz.
+                 resp[i][j]=mat[i][j];
+
+             }
+
+         }
+
+
+
+
+     }
+
+     void Retomar(){
+
+
+
+     }
+
+     void Pista(int mat[][], int resp[][]) throws InterruptedException {
+
+
+         for (int i = 0; i < mat.length; i++) {    // El primer índice recorre las filas.
+             for (int j = 0; j < mat[0].length; j++) {    // El segundo índice recorre las columnas.
+                 // Procesamos cada elemento de la matriz.
+                if( resp[i][j]!=mat[i][j]){
+
+
+                    Toast toast1 =
+                            Toast.makeText(getApplicationContext(),
+                                    "Debes corregir la celda ubicada en la fila "+i+"columna"+j+"gracias", Toast.LENGTH_SHORT);
+
+                    toast1.show();
+                    Thread.sleep(3000);
+
+                }
+
+             }
+
+         }
+
+
+
+     }
     }
 
 
