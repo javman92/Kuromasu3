@@ -1,0 +1,13 @@
+. . . . . .
+. . . 5 . .
+. 2 . . 5 .
+. . . . . .
+2 . 3 . . .
+. . . . . 4
+
+B B B N B B
+B N B 5 B N
+N 2 N B 5 B
+B B B B N B
+2 N 3 N B B
+N B B B N 4
