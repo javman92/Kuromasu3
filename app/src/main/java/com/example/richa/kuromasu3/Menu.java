@@ -72,7 +72,7 @@ public class Menu extends AppCompatActivity {
         for (int i =0; i<rows; i++){
             String row = "";
             for (int j=0; j < cols; j++){
-                row+= arr[i][j];
+                row+= arr[i][j]+",";
             }
             Log.d("Row", row);
         }
@@ -101,18 +101,18 @@ public class Menu extends AppCompatActivity {
         for (String line : lines) {
             //eje x
             int counterX =0;
-            //Log.d("LINE", line);
+            Log.d("LINE", line);
             char[] chars = line.toCharArray();
-            StringTokenizer st = new StringTokenizer(line);
-            while(st.hasMoreTokens()){
-                String element = st.nextToken(" ");
-                if(element.equals(".")){
-                    //Log.d("TOKEN1",element);
+            String[] r = line.split("\\s");
+            for (int i =0; i< r.length; i++){
+                //Log.d("TOKEN",r[i]);
+                if(r[i].equals(".")){
+                    Log.d("TOKEN1",r[i]);
                     initialMap[j][counterX++] = 0;
                 }
                 else{
-                    //Log.d("TOKEN2",element);
-                    initialMap[j][counterX++] = Integer.parseInt(element);
+                    Log.d("TOKEN2",r[i]);
+                    initialMap[j][counterX++] = Integer.parseInt(r[i]);
                 }
             }
 
