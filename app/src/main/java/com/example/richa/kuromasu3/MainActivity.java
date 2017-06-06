@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
                         }
 /*
                         for(int h=0;h<2;h++)    {
-                            for(int k=0;k<3;k++){System.out.println("matrizSolucion 1"+matrizSolucion[k][h]+"matriz2"+matrizInicial[k][h]);}
+                            for(int k=0;k<3;k++){System.out.println("matrizEstado 1"+matrizEstado[k][h]+"matriz2"+matrizInicial[k][h]);}
                         }*/
                     }
                 });
@@ -136,11 +136,11 @@ public class MainActivity extends AppCompatActivity {
 
     //Termina el Main Activity
 
-    //Comprueba matrizSolucion completa o no, true si es completa
+    //Comprueba matrizEstado completa o no, true si es completa
     private boolean comprobar(int matriz2[][]) {
         for (int i = 0; i < 2; i++) {    // El primer índice recorre las filas.
             for (int j = 0; j < 3; j++) {    // El segundo índice recorre las columnas.
-                // Procesamos cada elemento de la matrizSolucion.
+                // Procesamos cada elemento de la matrizEstado.
 
                 if (matriz2[i][j]==0) return false;
             }
@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
 
          for (int i = 0; i < mat.length; i++) {    // El primer índice recorre las filas.
              for (int j = 0; j < mat[0].length; j++) {    // El segundo índice recorre las columnas.
-                 // Procesamos cada elemento de la matrizSolucion.
+                 // Procesamos cada elemento de la matrizEstado.
                  resp[i][j]=mat[i][j];
 
      }
@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
     private void Pista(int mat[][], int resp[][]) throws InterruptedException {
          for (int i = 0; i < mat.length; i++) {    // El primer índice recorre las filas.
              for (int j = 0; j < mat[0].length; j++) {    // El segundo índice recorre las columnas.
-                 // Procesamos cada elemento de la matrizSolucion.
+                 // Procesamos cada elemento de la matrizEstado.
                 if( resp[i][j]!=mat[i][j]){
                     Toast toast1 =
                             Toast.makeText(getApplicationContext(),

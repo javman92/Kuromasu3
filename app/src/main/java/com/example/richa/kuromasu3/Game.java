@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -15,7 +14,7 @@ import java.util.Arrays;
 public class Game extends AppCompatActivity {
 
     int[][] matrizInicial = {{1,2,0}, {1, 1, 1}};
-    int matrizSolucion[][]= new int[2][3];
+    int[][] matrizEstado;
     int filas=2,columnas=3;
     LinearLayout layoutPrincipal;
 
@@ -26,8 +25,8 @@ public class Game extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        //matrizInicial = GetInitialMap();
-
+        matrizInicial = GetInitialMap();
+        matrizEstado = new int[filas][columnas];
         layoutPrincipal=(LinearLayout) this.findViewById(R.id.lLTablero);
         CrearTablero();
 
@@ -64,28 +63,28 @@ public class Game extends AppCompatActivity {
 
     private  void CheckSolution(int k, int p, Button b){
 
-        if(matrizSolucion[k][p]==0){
+        if(matrizEstado[k][p]==0){
             b.setBackgroundColor(Color.BLACK);
-            matrizSolucion[k][p]++;
+            matrizEstado[k][p]++;
         }
-        else if(matrizSolucion[k][p]==1){
+        else if(matrizEstado[k][p]==1){
             b.setBackgroundColor(Color.WHITE);
-            matrizSolucion[k][p]++;
+            matrizEstado[k][p]++;
         }
-        else {b.setBackgroundColor(Color.GRAY); matrizSolucion[k][p]=0;}
+        else {b.setBackgroundColor(Color.GRAY); matrizEstado[k][p]=0;}
 
 
 
-        if(Arrays.deepEquals(matrizInicial, matrizSolucion)){
+        if(Arrays.deepEquals(matrizInicial, matrizEstado)){
             Toast toast1 =Toast.makeText(getApplicationContext(),"Felicitaciones", Toast.LENGTH_SHORT);
             toast1.show();
             System.out.println("correcto");
         }
         else System.out.println("Incorrecto");
 
-        if(comprobar(matrizSolucion)) {
+        if(comprobar(matrizEstado)) {
 
-            if(Arrays.deepEquals(matrizInicial, matrizSolucion)){
+            if(Arrays.deepEquals(matrizInicial, matrizEstado)){
                 Toast toast1 = Toast.makeText(getApplicationContext(),"Felicitaciones", Toast.LENGTH_SHORT);
                 toast1.show();
                 System.out.println("correcto");
@@ -97,7 +96,7 @@ public class Game extends AppCompatActivity {
             }
 
             try {
-                Pista(matrizInicial, matrizSolucion);
+                Pista(matrizInicial, matrizEstado);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -116,9 +115,9 @@ public class Game extends AppCompatActivity {
                 final int k=i;
                 final Button b= new Button(this);
                 b.setText(String.valueOf(matrizInicial[i][j]));
-                matrizSolucion[i][j]=0;
+                matrizEstado[i][j]=0;
                 if(matrizInicial[i][j]!=0){
-                    matrizSolucion[i][j]=2;
+                    matrizEstado[i][j]=2;
                     b.setBackgroundColor(Color.WHITE);}
                     b.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -127,7 +126,7 @@ public class Game extends AppCompatActivity {
                     CheckSolution(k,p, b);
 /*
                         for(int h=0;h<2;h++)    {
-                            for(int k=0;k<3;k++){System.out.println("matrizSolucion 1"+matrizSolucion[k][h]+"matriz2"+matrizInicial[k][h]);}
+                            for(int k=0;k<3;k++){System.out.println("matrizEstado 1"+matrizEstado[k][h]+"matriz2"+matrizInicial[k][h]);}
                         }*/
                     }
                 });
@@ -139,11 +138,11 @@ public class Game extends AppCompatActivity {
 
     //Termina el Main Activity
 
-    //Comprueba matrizSolucion completa o no, true si es completa
+    //Comprueba matrizEstado completa o no, true si es completa
     private boolean comprobar(int matriz2[][]) {
         for (int i = 0; i < 2; i++) {    // El primer índice recorre las filas.
             for (int j = 0; j < 3; j++) {    // El segundo índice recorre las columnas.
-                // Procesamos cada elemento de la matrizSolucion.
+                // Procesamos cada elemento de la matrizEstado.
 
                 if (matriz2[i][j]==0) return false;
             }
@@ -156,7 +155,7 @@ public class Game extends AppCompatActivity {
 
         for (int i = 0; i < mat.length; i++) {    // El primer índice recorre las filas.
             for (int j = 0; j < mat[0].length; j++) {    // El segundo índice recorre las columnas.
-                // Procesamos cada elemento de la matrizSolucion.
+                // Procesamos cada elemento de la matrizEstado.
                 resp[i][j]=mat[i][j];
 
             }
@@ -173,7 +172,7 @@ public class Game extends AppCompatActivity {
     private void Pista(int mat[][], int resp[][]) throws InterruptedException {
         for (int i = 0; i < mat.length; i++) {    // El primer índice recorre las filas.
             for (int j = 0; j < mat[0].length; j++) {    // El segundo índice recorre las columnas.
-                // Procesamos cada elemento de la matrizSolucion.
+                // Procesamos cada elemento de la matrizEstado.
                 if( resp[i][j]!=mat[i][j]){
                     Toast toast1 =
                             Toast.makeText(getApplicationContext(),
