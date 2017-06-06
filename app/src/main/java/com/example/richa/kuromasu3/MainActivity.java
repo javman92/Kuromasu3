@@ -1,5 +1,6 @@
 package com.example.richa.kuromasu3;
 
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.os.Environment;
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     int filas=2;
     int columnas=3;
     int matriz[][]= new int[2][3];
+    Button btnIrAMenu;
 
     //gris=0,negro=1, blanco=2
 
@@ -47,16 +49,22 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
+        btnIrAMenu = (Button) findViewById(R.id.btnMenu);
+        btnIrAMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), Menu.class));
+            }
+        });
 
         LinearLayout layoutPrincipal=(LinearLayout) this.findViewById(R.id.principal);
 
         for ( int i = 0; i< filas; i++){
+
             LinearLayout layout = new LinearLayout(this);
 
             layout.setOrientation(LinearLayout.HORIZONTAL);
-
-
-//Y POR CADA COLUMNA UNA VISTA QUE PUEDE SER UN BUTTON Y REPRESENTA EL ESPACIO
+            //Y POR CADA COLUMNA UNA VISTA QUE PUEDE SER UN BUTTON Y REPRESENTA EL ESPACIO
             for( int j = 0; j<columnas; j++){
                 final int p = j;
                 final int k=i;
@@ -125,25 +133,16 @@ public class MainActivity extends AppCompatActivity {
 /*
                         for(int h=0;h<2;h++)    {
                             for(int k=0;k<3;k++){System.out.println("matriz 1"+matriz[k][h]+"matriz2"+juego[k][h]);}
-
-
-
-
-
                         }*/
-
                     }
                 });
-
-// y se añade al layout
+                // y se añade al layout
                 layout.addView(b);}
             layoutPrincipal.addView(layout);
         }
     }
 
-
-
-//Termina el Main Activity
+    //Termina el Main Activity
 
 //Comprueba matriz completa o no, true si es completa
 boolean comprobar(int matriz2[][]) {
@@ -151,12 +150,12 @@ boolean comprobar(int matriz2[][]) {
         for (int j = 0; j < 3; j++) {    // El segundo índice recorre las columnas.
             // Procesamos cada elemento de la matriz.
 
-            if (matriz2[i][j]==0) return false;
-    }
+                if (matriz2[i][j]==0) return false;
+        }
 
 }
 
-return true;}
+    return true;}
 
 
 
@@ -169,14 +168,10 @@ return true;}
                  // Procesamos cada elemento de la matriz.
                  resp[i][j]=mat[i][j];
 
-             }
-
-         }
-
-
-
-
      }
+
+        }
+        }
 
      void Retomar(){
 
