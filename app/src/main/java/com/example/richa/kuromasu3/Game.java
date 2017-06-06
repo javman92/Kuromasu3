@@ -1,63 +1,34 @@
 package com.example.richa.kuromasu3;
 
-import android.content.Intent;
-import android.content.res.AssetManager;
 import android.graphics.Color;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-
-
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 
-
-public class MainActivity extends AppCompatActivity {
+public class Game extends AppCompatActivity {
 
     int[][]juego = {{1,2,2}, {1, 1, 1}};
     int filas=2;
     int columnas=3;
     final int matriz[][]= new int[2][3];
-    LinearLayout layoutPrincipal;
+    LinearLayout linearLTablero;
 
-    private Button btnIrAMenu;
 
     //gris=0,negro=1, blanco=2
-
-    public MainActivity() throws IOException {
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        layoutPrincipal=(LinearLayout) this.findViewById(R.id.principal);
+        setContentView(R.layout.activity_game);
+        linearLTablero =(LinearLayout) this.findViewById(R.id.lLTablero);
 
-        btnIrAMenu = (Button) findViewById(R.id.btnMenu);
-        btnIrAMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), Menu.class));
-            }
-        });
 
         CreacionTablero();
     }
@@ -120,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
 // y se añade al layout
                 layout.addView(b);}
-            layoutPrincipal.addView(layout);
+            linearLTablero.addView(layout);
         }
     }
 
@@ -149,9 +120,3 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 }
-
-
-
-
-
-
