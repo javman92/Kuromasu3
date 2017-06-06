@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     int filas=2;
     int columnas=3;
     int matriz[][]= new int[2][3];
-    Button btnIrAMenu;
+    private Button btnIrAMenu;
 
     //gris=0,negro=1, blanco=2
 
@@ -43,12 +43,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
         btnIrAMenu = (Button) findViewById(R.id.btnMenu);
         btnIrAMenu.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,13 +72,9 @@ public class MainActivity extends AppCompatActivity {
                     matriz[i][j]=2;
                     b.setBackgroundColor(Color.WHITE);}
 
-
                 b.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-
-
-
 
                         if(matriz[k][p]==0){
                         b.setBackgroundColor(Color.BLACK);
@@ -132,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
                         }
 /*
                         for(int h=0;h<2;h++)    {
-                            for(int k=0;k<3;k++){System.out.println("matriz 1"+matriz[k][h]+"matriz2"+juego[k][h]);}
+                            for(int k=0;k<3;k++){System.out.println("matrizSolucion 1"+matrizSolucion[k][h]+"matriz2"+matrizInicial[k][h]);}
                         }*/
                     }
                 });
@@ -144,28 +136,24 @@ public class MainActivity extends AppCompatActivity {
 
     //Termina el Main Activity
 
-//Comprueba matriz completa o no, true si es completa
-boolean comprobar(int matriz2[][]) {
-    for (int i = 0; i < 2; i++) {    // El primer índice recorre las filas.
-        for (int j = 0; j < 3; j++) {    // El segundo índice recorre las columnas.
-            // Procesamos cada elemento de la matriz.
+    //Comprueba matrizSolucion completa o no, true si es completa
+    private boolean comprobar(int matriz2[][]) {
+        for (int i = 0; i < 2; i++) {    // El primer índice recorre las filas.
+            for (int j = 0; j < 3; j++) {    // El segundo índice recorre las columnas.
+                // Procesamos cada elemento de la matrizSolucion.
 
                 if (matriz2[i][j]==0) return false;
+            }
+
         }
+        return true;
+    }
 
-}
-
-    return true;}
-
-
-
-
-
-     void Guardar(int mat[][], int resp[][]){
+    private void Guardar(int mat[][], int resp[][]){
 
          for (int i = 0; i < mat.length; i++) {    // El primer índice recorre las filas.
              for (int j = 0; j < mat[0].length; j++) {    // El segundo índice recorre las columnas.
-                 // Procesamos cada elemento de la matriz.
+                 // Procesamos cada elemento de la matrizSolucion.
                  resp[i][j]=mat[i][j];
 
      }
@@ -173,38 +161,27 @@ boolean comprobar(int matriz2[][]) {
         }
         }
 
-     void Retomar(){
+    private void Retomar(){
 
 
 
      }
 
-     void Pista(int mat[][], int resp[][]) throws InterruptedException {
-
-
+    private void Pista(int mat[][], int resp[][]) throws InterruptedException {
          for (int i = 0; i < mat.length; i++) {    // El primer índice recorre las filas.
              for (int j = 0; j < mat[0].length; j++) {    // El segundo índice recorre las columnas.
-                 // Procesamos cada elemento de la matriz.
+                 // Procesamos cada elemento de la matrizSolucion.
                 if( resp[i][j]!=mat[i][j]){
-
-
                     Toast toast1 =
                             Toast.makeText(getApplicationContext(),
                                     "Debes corregir la celda ubicada en la fila "+i+"columna"+j+"gracias", Toast.LENGTH_SHORT);
-
                     toast1.show();
                     Thread.sleep(3000);
-
                 }
-
              }
-
          }
-
-
-
      }
-    }
+}
 
 
 
