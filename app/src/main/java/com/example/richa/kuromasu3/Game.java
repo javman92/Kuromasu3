@@ -4,8 +4,11 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -17,6 +20,12 @@ public class Game extends AppCompatActivity {
     int[][] matrizEstado;
     int filas=2,columnas=3;
     LinearLayout layoutPrincipal;
+    private GridLayout gridMap;
+
+    int screenWidth, screeHeight;
+
+
+    private int linearLayoutWidth;
 
     //gris=0, negro=1, blanco=2
 
@@ -25,8 +34,15 @@ public class Game extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        screeHeight = displayMetrics.heightPixels;
+        screenWidth = displayMetrics.widthPixels;
+
         matrizInicial = GetInitialMap();
         matrizEstado = new int[filas][columnas];
+        //gridMap = (GridLayout) findViewById(R.id.gridMap);
+
         layoutPrincipal=(LinearLayout) this.findViewById(R.id.lLTablero);
         CrearTablero();
 
@@ -38,7 +54,6 @@ public class Game extends AppCompatActivity {
             for (int j =0; j < cols; j++){
                 line += m[i][j] + ",";
             }
-            //Log.d("ROW", line);
         }
     }
 
@@ -65,6 +80,8 @@ public class Game extends AppCompatActivity {
 
         if(matrizEstado[k][p]==0){
             b.setBackgroundColor(Color.BLACK);
+
+
             matrizEstado[k][p]++;
         }
         else if(matrizEstado[k][p]==1){
@@ -105,34 +122,34 @@ public class Game extends AppCompatActivity {
 
     private void CrearTablero(){
         for ( int i = 0; i< filas; i++){
-
             LinearLayout layout = new LinearLayout(this);
-
             layout.setOrientation(LinearLayout.HORIZONTAL);
             //Y POR CADA COLUMNA UNA VISTA QUE PUEDE SER UN BUTTON Y REPRESENTA EL ESPACIO
             for( int j = 0; j<columnas; j++){
                 final int p = j;
                 final int k=i;
                 final Button b= new Button(this);
-                b.setText(String.valueOf(matrizInicial[i][j]));
                 matrizEstado[i][j]=0;
                 if(matrizInicial[i][j]!=0){
+                    b.setEnabled(false);
+                    b.setText(String.valueOf(matrizInicial[i][j]));
                     matrizEstado[i][j]=2;
-                    b.setBackgroundColor(Color.WHITE);}
-                    b.setOnClickListener(new View.OnClickListener() {
+                    b.setBackgroundColor(Color.WHITE);
+                }
+                b.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-
-                    CheckSolution(k,p, b);
-/*
-                        for(int h=0;h<2;h++)    {
-                            for(int k=0;k<3;k++){System.out.println("matrizEstado 1"+matrizEstado[k][h]+"matriz2"+matrizInicial[k][h]);}
-                        }*/
+                        CheckSolution(k,p, b);
                     }
                 });
+
+                int buttonSize = screenWidth/columnas - 5;
+                Log.d("BUTTONSIZE",buttonSize + "");
+                b.setLayoutParams(new LinearLayout.LayoutParams(buttonSize, buttonSize));
                 // y se añade al layout
-                layout.addView(b);}
-                layoutPrincipal.addView(layout);
+                layout.addView(b);
+          }
+            layoutPrincipal.addView(layout);
         }
     }
 
@@ -143,7 +160,6 @@ public class Game extends AppCompatActivity {
         for (int i = 0; i < 2; i++) {    // El primer índice recorre las filas.
             for (int j = 0; j < 3; j++) {    // El segundo índice recorre las columnas.
                 // Procesamos cada elemento de la matrizEstado.
-
                 if (matriz2[i][j]==0) return false;
             }
 
@@ -157,16 +173,11 @@ public class Game extends AppCompatActivity {
             for (int j = 0; j < mat[0].length; j++) {    // El segundo índice recorre las columnas.
                 // Procesamos cada elemento de la matrizEstado.
                 resp[i][j]=mat[i][j];
-
             }
-
         }
     }
 
     private void Retomar(){
-
-
-
     }
 
     private void Pista(int mat[][], int resp[][]) throws InterruptedException {
