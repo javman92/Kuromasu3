@@ -1,6 +1,7 @@
 package com.example.richa.kuromasu3;
 
 import android.content.Intent;
+import android.os.Environment;
 import android.support.annotation.IntegerRes;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,6 +10,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -34,6 +38,7 @@ public class Menu extends AppCompatActivity {
         setContentView(R.layout.activity_menu);
         LoadLevelList();
         IniButtons();
+        ListSavesGames();
 
     }
 
@@ -170,6 +175,7 @@ public class Menu extends AppCompatActivity {
         //intent.putExtra("MapaInicial", initialMap);
         intent.putExtra("MapaColumnas", mapCols);
         intent.putExtra("MapaFilas", mapRows);
+        intent.putExtra("LevelId", currentLevel);
         startActivity(intent);
     }
 
@@ -195,6 +201,43 @@ public class Menu extends AppCompatActivity {
                 Log.d("LOADMAP", "Archivo no disponible");
             }
 
+        }
+    }
+
+
+    public void ListSavesGames(){
+        String path = "/sdcard/";
+        Log.d("Files", "Path: " + path);
+        File directory = new File(path);
+        File[] files = directory.listFiles();
+        Log.d("Files", "Size: "+ files.length);
+        for (int i = 0; i < files.length; i++)
+        {
+            Log.d("Files", "FileName:" + files[i].getName());
+        }
+
+        read("save013");
+    }
+    public void read(String fname){
+
+        BufferedReader br = null;
+        String response = null;
+
+        try {
+
+            StringBuffer output = new StringBuffer();
+            String fpath = "/sdcard/"+fname+".txt";
+
+            br = new BufferedReader(new FileReader(fpath));
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                output.append(line +System.getProperty("line.separator"));
+            }
+            response = output.toString();
+
+            Log.d("READ", response);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
