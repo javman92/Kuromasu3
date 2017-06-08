@@ -21,6 +21,7 @@ public class Game extends AppCompatActivity {
     int filas=2,columnas=3;
     LinearLayout layoutPrincipal;
     private GridLayout gridMap;
+    private Button btnRestartGame, btnRules;
 
     int screenWidth, screeHeight;
 
@@ -38,6 +39,8 @@ public class Game extends AppCompatActivity {
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         screeHeight = displayMetrics.heightPixels;
         screenWidth = displayMetrics.widthPixels;
+
+        btnRestartGame = (Button) findViewById(R.id.btnRestartGame);
 
         matrizInicial = GetInitialMap();
         matrizEstado = new int[filas][columnas];

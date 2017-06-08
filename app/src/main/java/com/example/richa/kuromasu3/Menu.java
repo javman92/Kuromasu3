@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 public class Menu extends AppCompatActivity {
 
     private Button[] btnLevels;
-    private Button btnGameContinue, btnGameNew;
+    private Button btnGameContinue, btnGameNew, btnGameInfo;
     private TextView txtSelectedLevel;
     private int[][] initialMap;
     private int mapCols, mapRows;
@@ -149,6 +149,13 @@ public class Menu extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 NewGame();
+            }
+        });
+        btnGameInfo = (Button) findViewById(R.id.btnGameInfo);
+        btnGameInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), Rules.class));
             }
         });
         txtSelectedLevel = (TextView) findViewById(R.id.txtLevelSelected);

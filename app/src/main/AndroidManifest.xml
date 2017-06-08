@@ -17,7 +17,15 @@
             </intent-filter>
         </activity>
         <activity android:name=".Menu" />
-        <activity android:name=".Game"></activity>
+        <activity android:name=".Game" />
+        <activity android:name=".Rules"
+            android:parentActivityName=".Menu">
+
+            <!-- The meta-data tag is required if you support API level 15 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".Menu" />>
+        </activity>
     </application>
 
 </manifest>
