@@ -2,34 +2,35 @@ package com.example.richa.kuromasu3;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 
 public class Game extends AppCompatActivity {
 
-//    int[][] matrizInicial = {{1,2,0}, {1, 1, 1}};
-    int[][] matrizInicial;
-    int[][] matrizEstado;
-    char[][] matrizEstadoGuardar;
-    int filas=2,columnas=3, levelId;
-    LinearLayout layoutPrincipal;
-    private GridLayout gridMap;
-    private Button btnRestartGame, btnRules, btnSaveGame;
-    int screenWidth, screeHeight;
+//  int[][] matrizInicial = {{1,2,0}, {1, 1, 1}};
+    private int[][] matrizInicial;  // 0 y los valores de las casillas no tocables
+    private int[][] matrizEstado;   // N's y B's con los numeros de las casillas no tocables
+    private char[][] matrizSavedMap; // matriz que viene desde el save
+    private Button[][] botones;
+    private int rows =2, columns =3, levelId;
+    private LinearLayout layoutPrincipal;
+    private Button btnRestartGame, btnSaveGame;
+    private int screenWidth, screeHeight;
+    private String gameMode;
 
 
     private int linearLayoutWidth;
@@ -41,11 +42,8 @@ public class Game extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        screeHeight = displayMetrics.heightPixels;
-        screenWidth = displayMetrics.widthPixels;
-
+        IniDisplay();
+        //BUTTONS
         btnRestartGame = (Button) findViewById(R.id.btnRestartGame);
         btnSaveGame = (Button) findViewById(R.id.btnSaveGame);
         btnSaveGame.setOnClickListener(new View.OnClickListener() {
@@ -55,26 +53,114 @@ public class Game extends AppCompatActivity {
             }
         });
 
+        //TABLERO
+        gameMode = GetMode();
+        Log.d("MODE", gameMode);
+        rows = GetRowns();
+        columns = GetColumns();
+        levelId = GetMapId();
+
+        matrizEstado = new int[rows][columns];
+        matrizSavedMap = new char[rows][columns];
+        botones = new Button[rows][columns];
+
+
         matrizInicial = GetInitialMap();
-        matrizEstado = new int[filas][columnas];
-        matrizEstadoGuardar = new char[filas][columnas];
-        //gridMap = (GridLayout) findViewById(R.id.gridMap);
+        matrizEstado = matrizInicial;
+        if(gameMode.equals("CONTINUE")){
+            LoadSavedGame("save0"+levelId);
+            matrizEstado = GetCurrentSavedMap();
+        }
+        Log.d("MATRIZINICIAL","matrizInicial");
+        PrintMatrizInt(matrizInicial);
+        Log.d("MATRIZINICIAL","matrizEstado");
+        PrintMatrizInt(matrizEstado);
+        Log.d("MATRIZINICIAL","matrizSave");
+        PrintMatrizChar(matrizSavedMap);
+
+
+//
 
         layoutPrincipal=(LinearLayout) this.findViewById(R.id.lLTablero);
 
         CrearTablero();
+        PintarTablero();
 
     }
+    private void IniDisplay(){
+        // DISPLAY
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        screeHeight = displayMetrics.heightPixels;
+        screenWidth = displayMetrics.widthPixels;
+    }
+    private String GetMode(){
+        Intent in = getIntent();
+        return in.getStringExtra("MODE");
+    }
+    private int GetColumns(){
+        Intent in = getIntent();
+        return in.getIntExtra("MapaColumnas", 99 );
+    }
+    private int GetRowns(){
+        Intent in = getIntent();
+        return in.getIntExtra("MapaFilas", 99 );
+    }
+    private int GetMapId(){
+        Intent in = getIntent();
+        return in.getIntExtra("LevelId", 99 );
+    }
+    private int[][] GetInitialMap(){
+        Intent in = getIntent();
+        int[][] inMatrix = null;
+        Object[] objectArray = (Object[]) getIntent().getExtras().getSerializable("InitialMap");
+        if(objectArray!=null){
+            inMatrix = new int[objectArray.length][];
+            for(int i=0;i<objectArray.length;i++){
+                inMatrix[i]=(int[]) objectArray[i];
+            }
+        }
+        return inMatrix;
+    }
+    private char[][] GetSavedMap(){
+        char[][] inMatrix = null;
+        Object[] objectArray = (Object[]) getIntent().getExtras().getSerializable("SaveMap");
+        if(objectArray!=null){
+            inMatrix = new char[objectArray.length][];
+            for(int i=0;i<objectArray.length;i++){
+                inMatrix[i]=(char[]) objectArray[i];
+                Log.d("CHAR",inMatrix[i] +"");
+            }
+        }
+        return inMatrix;
+    }
 
+    private int[][] GetCurrentSavedMap(){
+        int[][] tmp = new int[rows][columns];
+        for (int i = 0; i< rows; i++){
+            for (int j = 0; j< columns; j++){
+                if(matrizSavedMap[i][j] == 'N'){
+                    tmp[i][j] = 1;
+                }else if(matrizSavedMap[i][j] == 'B'){
+                    tmp[i][j] = 2;
+                }else{
+                    tmp[i][j] = matrizInicial[i][j];
+                }
+            }
+        }
+        Log.d("matrizestado","matrizestado");
+        PrintMatrizInt(tmp);
+        return tmp;
+    }
     //Parsea arreglo de chars
     private void SaveGame() {
 
         String content="";
         String line="";
-        for (int i =0; i< filas; i++){
+        for (int i = 0; i< rows; i++){
             line="";
-            for (int j =0; j < columnas; j++){
-                line += matrizEstadoGuardar[i][j] + " ";
+            for (int j = 0; j < columns; j++){
+                line += matrizSavedMap[i][j] + " ";
             }
             line+= System.getProperty("line.separator");
             content += line;
@@ -116,56 +202,38 @@ public class Game extends AppCompatActivity {
     }
 
     private void PrintMatrizInt(int[][] m){
-        String line;
-        for (int i =0; i< filas; i++){
-            line ="";
-            for (int j =0; j < columnas; j++){
+        String line ="";
+        for (int i = 0; i< rows; i++){
+            for (int j = 0; j < columns; j++){
                 line += m[i][j] + ",";
             }
+            line += System.lineSeparator();
         }
+        Log.d("INT[][]", line);
     }
 
     private void PrintMatrizChar(char[][] m){
-        String line;
-        for (int i =0; i< filas; i++){
-            line ="";
-            for (int j =0; j < columnas; j++){
+        String line= "";
+        for (int i = 0; i< rows; i++){
+            //line ="";
+            for (int j = 0; j < columns; j++){
                 line += m[i][j] + ",";
             }
-            Log.d("ROW", line);
+            line += System.lineSeparator();
         }
-    }
-
-    private int[][] GetInitialMap(){
-        Intent in = getIntent();
-        int cols = in.getIntExtra("MapaColumnas", 99 );
-        int rows = in.getIntExtra("MapaFilas", 99 );
-        int lId = in.getIntExtra("LevelId", 99 );
-        filas = rows;
-        columnas = cols;
-        levelId = lId;
-        int[][] inMatrix = null;
-        Object[] objectArray = (Object[]) getIntent().getExtras().getSerializable("InitialMap");
-        if(objectArray!=null){
-            inMatrix = new int[objectArray.length][];
-            for(int i=0;i<objectArray.length;i++){
-                inMatrix[i]=(int[]) objectArray[i];
-            }
-        }
-
-        return inMatrix;
+        Log.d("CHAR[][]", line);
     }
 
     private void ChangeButtonState(int k, int p, Button b){
         if(matrizEstado[k][p]==0){
             b.setBackgroundColor(Color.BLACK);
             matrizEstado[k][p]++;
-            matrizEstadoGuardar[k][p]='N'; // NEGRO
+            matrizSavedMap[k][p]='N'; // NEGRO
         }
         else if(matrizEstado[k][p]==1){
             b.setBackgroundColor(Color.WHITE);
             matrizEstado[k][p]++;
-            matrizEstadoGuardar[k][p]='B'; // BLANCO
+            matrizSavedMap[k][p]='B'; // BLANCO
         }
         else {
             b.setBackgroundColor(Color.GRAY); // GRIS
@@ -209,33 +277,25 @@ public class Game extends AppCompatActivity {
     }
 
     private void CrearTablero(){
-        for ( int i = 0; i< filas; i++){
+        for (int i = 0; i< rows; i++){
             LinearLayout layout = new LinearLayout(this);
             layout.setOrientation(LinearLayout.HORIZONTAL);
             //Y POR CADA COLUMNA UNA VISTA QUE PUEDE SER UN BUTTON Y REPRESENTA EL ESPACIO
-            for( int j = 0; j<columnas; j++){
+            for(int j = 0; j< columns; j++){
                 final int p = j;
-                final int k=i;
+                final int k = i;
                 final Button b= new Button(this);
-                matrizEstado[i][j]=0;
-                matrizEstadoGuardar[i][j]='G'; // GRIS
-                if(matrizInicial[i][j]!=0){
-                    b.setEnabled(false);
-                    b.setText(String.valueOf(matrizInicial[i][j]));
-                    matrizEstado[i][j]=2;
-                    matrizEstadoGuardar[i][j]='0';
-                    b.setBackgroundColor(Color.WHITE);
-                }
+                botones[i][j] = b;
                 b.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         ChangeButtonState(k,p, b);
-                        ButtonPressed();
-                        PrintMatrizChar(matrizEstadoGuardar);
+                        //ButtonPressed();
+                        PrintMatrizChar(matrizSavedMap);
                     }
                 });
 
-                int buttonSize = screenWidth/columnas - 5;
+                int buttonSize = screenWidth/ columns - 5;
                 b.setLayoutParams(new LinearLayout.LayoutParams(buttonSize, buttonSize));
                 // y se añade al layout
                 layout.addView(b);
@@ -244,12 +304,30 @@ public class Game extends AppCompatActivity {
         }
     }
 
+    private void PintarTablero(){
+        for (int i = 0; i< rows; i++){
+            for(int j = 0; j< columns; j++) {
+                if (matrizInicial[i][j]== 0) {
+                    if (matrizEstado[i][j] == 1) {
+                        botones[i][j].setBackgroundColor(Color.BLACK);
+
+                    } else if (matrizEstado[i][j] == 2) {
+                        botones[i][j].setBackgroundColor(Color.WHITE);
+                    }
+                }else{
+                      botones[i][j].setEnabled(false);
+                      botones[i][j].setText(String.valueOf(matrizEstado[i][j]));
+                  }
+            }
+        }
+    }
+
     //Termina el Main Activity
 
     //Comprueba matrizEstado completa o no, true si es completa
     private boolean comprobar(int matriz2[][]) {
-        for (int i = 0; i < 2; i++) {    // El primer índice recorre las filas.
-            for (int j = 0; j < 3; j++) {    // El segundo índice recorre las columnas.
+        for (int i = 0; i < 2; i++) {    // El primer índice recorre las rows.
+            for (int j = 0; j < 3; j++) {    // El segundo índice recorre las columns.
                 // Procesamos cada elemento de la matrizEstado.
                 if (matriz2[i][j]==0) return false;
             }
@@ -258,22 +336,9 @@ public class Game extends AppCompatActivity {
         return true;
     }
 
-    private void Guardar(int mat[][], int resp[][]){
-
-        for (int i = 0; i < mat.length; i++) {    // El primer índice recorre las filas.
-            for (int j = 0; j < mat[0].length; j++) {    // El segundo índice recorre las columnas.
-                // Procesamos cada elemento de la matrizEstado.
-                resp[i][j]=mat[i][j];
-            }
-        }
-    }
-
-    private void Retomar(){
-    }
-
     private void Pista(int mat[][], int resp[][]) throws InterruptedException {
-        for (int i = 0; i < mat.length; i++) {    // El primer índice recorre las filas.
-            for (int j = 0; j < mat[0].length; j++) {    // El segundo índice recorre las columnas.
+        for (int i = 0; i < mat.length; i++) {    // El primer índice recorre las rows.
+            for (int j = 0; j < mat[0].length; j++) {    // El segundo índice recorre las columns.
                 // Procesamos cada elemento de la matrizEstado.
                 if( resp[i][j]!=mat[i][j]){
                     Toast toast1 =
@@ -285,4 +350,63 @@ public class Game extends AppCompatActivity {
             }
         }
     }
+
+    public void LoadSavedGame(String text){
+        String savedLevel = read(text);
+
+        if(savedLevel != null){
+            Log.e("READ", "Saved Game cargado" );
+            //btnGameContinue.setEnabled(true);
+            ParseSavedGame(savedLevel);
+        }else{
+            Log.e("READ", "Saved Game no existente" );
+            //btnGameContinue.setEnabled(false);
+        }
+
+    }
+
+    public String read(String fname){
+
+        BufferedReader br = null;
+        String response = null;
+
+        try {
+
+            StringBuffer output = new StringBuffer();
+            String fpath = "/sdcard/"+fname+".txt";
+
+            br = new BufferedReader(new FileReader(fpath));
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                output.append(line +System.getProperty("line.separator"));
+            }
+            response = output.toString();
+
+            //Log.d("READ", response);
+        } catch (IOException e) {
+
+            e.printStackTrace();
+            return null;
+        }
+        return response;
+    }
+
+
+    public void ParseSavedGame(String savedLevel){
+        String[] lines = savedLevel.split("\n|\n ");
+        // eje y
+        int j =0;
+        for (String line : lines) {
+            //eje x
+            int counterX =0;
+            String[] r = line.split("\\s");
+            for (int i =0; i< r.length; i++){
+                char[] chars = r[i].toCharArray();
+                matrizSavedMap[j][counterX++] = chars[0];
+            }
+            j++;
+            if(j > rows){break;}
+        }
+    }
+
 }
