@@ -33,6 +33,7 @@ public class Game extends AppCompatActivity {
     private Button btnRestartGame, btnSaveGame;
     private int screenWidth, screeHeight;
     private String gameMode;
+    private boolean IsGameWon = false;
 
 
     private int linearLayoutWidth;
@@ -66,7 +67,6 @@ public class Game extends AppCompatActivity {
         matrizSavedMap = new char[rows][columns];
         botones = new Button[rows][columns];
 
-
         matrizInicial = GetInitialMap();
         matrizSucces = GetSuccesMap();
 
@@ -75,14 +75,14 @@ public class Game extends AppCompatActivity {
             LoadSavedGame("save0"+levelId);
             matrizEstado = GetCurrentSavedMap();
         }
-        Log.d("MATRIZINICIAL","matrizInicial");
-        PrintMatrizInt(matrizInicial);
-        Log.d("MATRIZINICIAL","matrizEstado");
-        PrintMatrizInt(matrizEstado);
-        Log.d("MATRIZINICIAL","matrizSave");
-        PrintMatrizChar(matrizSavedMap);
-        Log.d("MATRIZINICIAL","matrizSucces");
-        PrintMatrizChar(matrizSucces);
+//        Log.d("MATRIZINICIAL","matrizInicial");
+//        PrintMatrizInt(matrizInicial);
+//        Log.d("MATRIZINICIAL","matrizEstado");
+//        PrintMatrizInt(matrizEstado);
+//        Log.d("MATRIZINICIAL","matrizSave");
+//        PrintMatrizChar(matrizSavedMap);
+//        Log.d("MATRIZINICIAL","matrizSucces");
+//        PrintMatrizChar(matrizSucces);
 
         layoutPrincipal=(LinearLayout) this.findViewById(R.id.lLTablero);
 
@@ -90,6 +90,7 @@ public class Game extends AppCompatActivity {
         PintarTablero();
 
     }
+    // INITIAL SETTING
     private void IniDisplay(){
         // DISPLAY
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -125,18 +126,6 @@ public class Game extends AppCompatActivity {
         }
         return inMatrix;
     }
-    private char[][] GetSavedMap(){
-        char[][] inMatrix = null;
-        Object[] objectArray = (Object[]) getIntent().getExtras().getSerializable("SaveMap");
-        if(objectArray!=null){
-            inMatrix = new char[objectArray.length][];
-            for(int i=0;i<objectArray.length;i++){
-                inMatrix[i]=(char[]) objectArray[i];
-                Log.d("CHAR",inMatrix[i] +"");
-            }
-        }
-        return inMatrix;
-    }
     private char[][] GetSuccesMap(){
         char[][] inMatrix = null;
         Object[] objectArray = (Object[]) getIntent().getExtras().getSerializable("SuccesMap");
@@ -166,10 +155,10 @@ public class Game extends AppCompatActivity {
         PrintMatrizInt(tmp);
         return tmp;
     }
+    ///////////////////////////////////////////////////////////////////
 
-    //Parsea arreglo de chars
+    // GUARDA JUEGO
     private void SaveGame() {
-
         String content="";
         String line="";
         for (int i = 0; i< rows; i++){
@@ -215,28 +204,78 @@ public class Game extends AppCompatActivity {
         }
 
     }
+    ////////////////////////////////////////////////////////////////////
 
-    private void PrintMatrizInt(int[][] m){
-        String line ="";
-        for (int i = 0; i< rows; i++){
-            for (int j = 0; j < columns; j++){
-                line += m[i][j] + ",";
+    // GAME STATE
+    private boolean GameWin(){
+        int equals =0;
+        int succes = rows*columns;
+        for (int i = 0; i < rows; i++){
+            for (int j =0; j < columns; j++){
+                if (matrizEstado[i][j] != matrizSucces[i][j] ){
+                    return false;
+                }else{
+                    equals++;
+                }
             }
-            line += System.lineSeparator();
         }
-        Log.d("INT[][]", line);
+        return true;
     }
 
-    private void PrintMatrizChar(char[][] m){
-        String line= "";
-        for (int i = 0; i< rows; i++){
-            //line ="";
-            for (int j = 0; j < columns; j++){
-                line += m[i][j] + ",";
-            }
-            line += System.lineSeparator();
+    private void CheckGameState(){
+        if(GameWin()){
+            CreateToast("Felicitaciones");
+        }else{
+            Log.d("GAMEWIN", "FALSE");
         }
-        Log.d("CHAR[][]", line);
+    }
+    /////////////////////////////////////////////////////////////////////
+
+    // TABLERO
+    private void CrearTablero(){
+        for (int i = 0; i< rows; i++){
+            LinearLayout layout = new LinearLayout(this);
+            layout.setOrientation(LinearLayout.HORIZONTAL);
+            //Y POR CADA COLUMNA UNA VISTA QUE PUEDE SER UN BUTTON Y REPRESENTA EL ESPACIO
+            for(int j = 0; j< columns; j++){
+                final int p = j;
+                final int k = i;
+                final Button b= new Button(this);
+                botones[i][j] = b;
+                b.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if(!IsGameWon){
+                            ChangeButtonState(k,p, b);
+                            PrintMatrizChar(matrizSavedMap);
+                            CheckGameState();
+                        }
+                    }
+                });
+                int buttonSize = screenWidth/ columns - 5;
+                b.setLayoutParams(new LinearLayout.LayoutParams(buttonSize, buttonSize));
+                layout.addView(b);
+            }
+            layoutPrincipal.addView(layout);
+        }
+    }
+
+    private void PintarTablero(){
+        for (int i = 0; i< rows; i++){
+            for(int j = 0; j< columns; j++) {
+                if (matrizInicial[i][j]== 0) {
+                    if (matrizEstado[i][j] == 1) {
+                        botones[i][j].setBackgroundColor(Color.BLACK);
+
+                    } else if (matrizEstado[i][j] == 2) {
+                        botones[i][j].setBackgroundColor(Color.WHITE);
+                    }
+                }else{
+                      botones[i][j].setEnabled(false);
+                      botones[i][j].setText(String.valueOf(matrizEstado[i][j]));
+                  }
+            }
+        }
     }
 
     private void ChangeButtonState(int k, int p, Button b){
@@ -256,110 +295,8 @@ public class Game extends AppCompatActivity {
         }
     }
 
-    private void CreateToast(String string){
-        Toast toast1 = Toast.makeText(getApplicationContext(),string, Toast.LENGTH_SHORT);
-        toast1.show();
-    }
-
-
-    private boolean GameWin(){
-        int equals =0;
-        int succes = rows*columns;
-        for (int i = 0; i < rows; i++){
-            for (int j =0; j < columns; j++){
-                if (matrizEstado[i][j] != matrizSucces[i][j] ){
-                    return false;
-                }else{
-
-                    equals++;
-                }
-            }
-        }
-        return true;
-    }
-
-
-    private void CrearTablero(){
-        for (int i = 0; i< rows; i++){
-            LinearLayout layout = new LinearLayout(this);
-            layout.setOrientation(LinearLayout.HORIZONTAL);
-            //Y POR CADA COLUMNA UNA VISTA QUE PUEDE SER UN BUTTON Y REPRESENTA EL ESPACIO
-            for(int j = 0; j< columns; j++){
-                final int p = j;
-                final int k = i;
-                final Button b= new Button(this);
-                botones[i][j] = b;
-                b.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        ChangeButtonState(k,p, b);
-                        PrintMatrizChar(matrizSavedMap);
-                        CheckGameState();
-                    }
-                });
-                int buttonSize = screenWidth/ columns - 5;
-                b.setLayoutParams(new LinearLayout.LayoutParams(buttonSize, buttonSize));
-                // y se añade al layout
-                layout.addView(b);
-          }
-            layoutPrincipal.addView(layout);
-        }
-    }
-
-    private void CheckGameState(){
-        if(GameWin()){
-            CreateToast("Felicitaciones");
-        }else{
-            Log.d("GAMEWIN", "FALSE");
-        }
-    }
-    private void PintarTablero(){
-        for (int i = 0; i< rows; i++){
-            for(int j = 0; j< columns; j++) {
-                if (matrizInicial[i][j]== 0) {
-                    if (matrizEstado[i][j] == 1) {
-                        botones[i][j].setBackgroundColor(Color.BLACK);
-
-                    } else if (matrizEstado[i][j] == 2) {
-                        botones[i][j].setBackgroundColor(Color.WHITE);
-                    }
-                }else{
-                      botones[i][j].setEnabled(false);
-                      botones[i][j].setText(String.valueOf(matrizEstado[i][j]));
-                  }
-            }
-        }
-    }
-
-    //Termina el Main Activity
-
-    //Comprueba matrizEstado completa o no, true si es completa
-    private boolean comprobar(int matriz2[][]) {
-        for (int i = 0; i < 2; i++) {    // El primer índice recorre las rows.
-            for (int j = 0; j < 3; j++) {    // El segundo índice recorre las columns.
-                // Procesamos cada elemento de la matrizEstado.
-                if (matriz2[i][j]==0) return false;
-            }
-
-        }
-        return true;
-    }
-
-    private void Pista(int mat[][], int resp[][]) throws InterruptedException {
-        for (int i = 0; i < mat.length; i++) {    // El primer índice recorre las rows.
-            for (int j = 0; j < mat[0].length; j++) {    // El segundo índice recorre las columns.
-                // Procesamos cada elemento de la matrizEstado.
-                if( resp[i][j]!=mat[i][j]){
-                    Toast toast1 =
-                            Toast.makeText(getApplicationContext(),
-                                    "Debes corregir la celda ubicada en la fila "+i+"columna"+j+"gracias", Toast.LENGTH_SHORT);
-                    toast1.show();
-                    Thread.sleep(3000);
-                }
-            }
-        }
-    }
-
+    ////////////////////////////////////////////////////////////////////
+    // Load save Data
     public void LoadSavedGame(String text){
         String savedLevel = read(text);
 
@@ -416,5 +353,40 @@ public class Game extends AppCompatActivity {
             if(j > rows){break;}
         }
     }
+    ///////////////////////////////////////////////////////////////////
+
+    // OTROS
+    private void CreateToast(String string){
+        Toast toast1 = Toast.makeText(getApplicationContext(),string, Toast.LENGTH_SHORT);
+        toast1.show();
+    }
+    ///////////////////////////////////////////////////////////////////
+
+
+    // Con proposito de debug
+    private void PrintMatrizInt(int[][] m){
+        String line ="";
+        for (int i = 0; i< rows; i++){
+            for (int j = 0; j < columns; j++){
+                line += m[i][j] + ",";
+            }
+            line += System.lineSeparator();
+        }
+        Log.d("INT[][]", line);
+    }
+
+    private void PrintMatrizChar(char[][] m){
+        String line= "";
+        for (int i = 0; i< rows; i++){
+            //line ="";
+            for (int j = 0; j < columns; j++){
+                line += m[i][j] + ",";
+            }
+            line += System.lineSeparator();
+        }
+        Log.d("CHAR[][]", line);
+    }
+    /////////////////////////////////////////////////
+
 
 }
