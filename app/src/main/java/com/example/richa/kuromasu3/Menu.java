@@ -27,7 +27,7 @@ public class Menu extends AppCompatActivity {
     private Button btnGameContinue, btnGameNew, btnGameInfo;
     private TextView txtSelectedLevel;
     private int[][] initialMap;
-    private char[][] savedMap;
+    private char[][] savedMap, succesMap;
     private int mapCols, mapRows;
     private int totalLevels, currentLevel;
     private Map listLevels = new HashMap();
@@ -56,6 +56,7 @@ public class Menu extends AppCompatActivity {
         mapCols = columns;
         mapRows = rows;
         int[][] mapRow = new int[rows][columns];
+
         //PrintMap(mapRow,columns,rows);
         return mapRow;
     }
@@ -102,28 +103,42 @@ public class Menu extends AppCompatActivity {
     private void GetMap(String level){
         String[] lines = level.split("\n|\n ");
         initialMap = MapInitialize(lines);
+        succesMap = new char[mapRows][mapCols];
         // eje y
-        int j =0;
+        int j =0, counterZ=0;
         for (String line : lines) {
             //eje x
-            int counterX =0;
+            int counterX =0,counterY =0;
             //Log.d("LINE", line);
-            char[] chars = line.toCharArray();
-            String[] r = line.split("\\s");
-            for (int i =0; i< r.length; i++){
-                //Log.d("TOKEN",r[i]);
-                if(r[i].equals(".")){
-                    //Log.d("TOKEN1",r[i]);
-                    initialMap[j][counterX++] = 0;
+            //char[] chars = line.toCharArray();
+            if(j != mapRows - 1){
+                String[] r = line.split("\\s");
+                for (int i =0; i< r.length; i++){
+                    //Log.d("TOKEN",r[i]);
+                    if(j <= mapRows){
+                        //break;
+                        if(r[i].equals(".")){
+                            //Log.d("TOKEN1",r[i]);
+                            initialMap[j][counterX++] = 0;
+                        }
+                        else{
+                            //Log.d("TOKEN2",r[i]);
+                            initialMap[j][counterX++] = Integer.parseInt(r[i]);
+                        }
+                    }else{
+                        char[] chars = r[i].toCharArray();
+                        //Log.d("CHAR1",counterZ+"");
+                        succesMap[counterZ][counterY++] = chars[0];
+                        //Log.d("CHAR2",succesMap[counterZ][counterY++]+"");
+                    }
                 }
-                else{
-                    //Log.d("TOKEN2",r[i]);
-                    initialMap[j][counterX++] = Integer.parseInt(r[i]);
-                }
+
+                if(j > mapRows && counterZ < mapRows - 1) {counterZ++;}
             }
-            j++;
-            if(j > mapRows){break;}
+            if(j<=mapRows){j++;}
+
         }
+        PrintMapChar(succesMap);
     }
 
     // Carga en un diccionario una lista de todos los niveles disponibles en la carpeta mapas en assets
@@ -183,6 +198,7 @@ public class Menu extends AppCompatActivity {
         Intent intent = new Intent(this, Game.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("InitialMap", initialMap);
+        bundle.putSerializable("SuccesMap", succesMap);
         intent.putExtras(bundle);
         //intent.putExtra("MapaInicial", initialMap);
         intent.putExtra("MODE","NEWGAME");
@@ -198,6 +214,7 @@ public class Menu extends AppCompatActivity {
         Bundle bundle = new Bundle();
 
         bundle.putSerializable("InitialMap", initialMap);
+        bundle.putSerializable("SuccesMap", succesMap);
         //bundle.putSerializable("SaveMap", savedMap);
         intent.putExtras(bundle);
         intent.putExtra("MODE","CONTINUE");
