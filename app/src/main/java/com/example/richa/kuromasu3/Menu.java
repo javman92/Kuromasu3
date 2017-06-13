@@ -111,7 +111,7 @@ public class Menu extends AppCompatActivity {
             int counterX =0,counterY =0;
             //Log.d("LINE", line);
             //char[] chars = line.toCharArray();
-            if(j != mapRows - 1){
+            if(j != mapRows){
                 String[] r = line.split("\\s");
                 for (int i =0; i< r.length; i++){
                     //Log.d("TOKEN",r[i]);
@@ -317,6 +317,6 @@ public class Menu extends AppCompatActivity {
             j++;
             if(j > mapRows){break;}
         }
-        PrintMapChar(savedMap);
+        //PrintMapChar(savedMap);
     }
 }

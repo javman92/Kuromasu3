@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -22,18 +23,20 @@ import java.util.Arrays;
 public class Game extends AppCompatActivity {
 
 //  int[][] matrizInicial = {{1,2,0}, {1, 1, 1}};
-    private int[][] matrizInicial;  // 0 y los valores de las casillas no tocables
-    private int[][] matrizEstado;   // N's y B's con los numeros de las casillas no tocables
-    private char[][] matrizSavedMap; // matriz que viene desde el save
-    private char[][] matrizSucces; // matriz que viene desde el save
-
-    private Button[][] botones;
-    private int rows =2, columns =3, levelId;
-    private LinearLayout layoutPrincipal;
-    private Button btnRestartGame, btnSaveGame;
+    private int[][] matrizInicial;  // setting original del mapa
+    private int[][] matrizEstado;   // N's = 1 y B's = 2 con los numeros de las casillas no tocables
+    private char[][] matrizSavedMap; // matriz que representa la matriz estado en forma de caracteres
+    private char[][] matrizSucces; // matriz que almacena el resultado correcto del juego
     private int screenWidth, screeHeight;
     private String gameMode;
     private boolean IsGameWon = false;
+    private int rows =2, columns =3, levelId;
+
+    private TextView txtLevelName;
+    private LinearLayout layoutPrincipal;
+    private Button btnRestartGame, btnSaveGame;
+    private Button[][] botones;
+
 
 
     private int linearLayoutWidth;
@@ -45,9 +48,17 @@ public class Game extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
+        //Display
         IniDisplay();
-        //BUTTONS
+
+        txtLevelName = (TextView) findViewById(R.id.txtLevelName);
         btnRestartGame = (Button) findViewById(R.id.btnRestartGame);
+        btnRestartGame.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RestartGame();
+            }
+        });
         btnSaveGame = (Button) findViewById(R.id.btnSaveGame);
         btnSaveGame.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,6 +73,7 @@ public class Game extends AppCompatActivity {
         rows = GetRowns();
         columns = GetColumns();
         levelId = GetMapId();
+        txtLevelName.setText("Level0" + levelId);
 
         matrizEstado = new int[rows][columns];
         matrizSavedMap = new char[rows][columns];
@@ -75,14 +87,7 @@ public class Game extends AppCompatActivity {
             LoadSavedGame("save0"+levelId);
             matrizEstado = GetCurrentSavedMap();
         }
-//        Log.d("MATRIZINICIAL","matrizInicial");
-//        PrintMatrizInt(matrizInicial);
-//        Log.d("MATRIZINICIAL","matrizEstado");
-//        PrintMatrizInt(matrizEstado);
-//        Log.d("MATRIZINICIAL","matrizSave");
-//        PrintMatrizChar(matrizSavedMap);
-//        Log.d("MATRIZINICIAL","matrizSucces");
-//        PrintMatrizChar(matrizSucces);
+        //PrintMatrices();
 
         layoutPrincipal=(LinearLayout) this.findViewById(R.id.lLTablero);
 
@@ -151,8 +156,6 @@ public class Game extends AppCompatActivity {
                 }
             }
         }
-        Log.d("matrizestado","matrizestado");
-        PrintMatrizInt(tmp);
         return tmp;
     }
     ///////////////////////////////////////////////////////////////////
@@ -229,6 +232,12 @@ public class Game extends AppCompatActivity {
             Log.d("GAMEWIN", "FALSE");
         }
     }
+
+    private void RestartGame(){
+        matrizEstado = matrizInicial;
+        //PrintMatrices();
+        PintarTablero();
+    }
     /////////////////////////////////////////////////////////////////////
 
     // TABLERO
@@ -266,13 +275,15 @@ public class Game extends AppCompatActivity {
                 if (matrizInicial[i][j]== 0) {
                     if (matrizEstado[i][j] == 1) {
                         botones[i][j].setBackgroundColor(Color.BLACK);
-
                     } else if (matrizEstado[i][j] == 2) {
                         botones[i][j].setBackgroundColor(Color.WHITE);
+                    }else if(matrizEstado[i][j] == 0){
+                        botones[i][j].setBackgroundColor(Color.GRAY);
                     }
                 }else{
-                      botones[i][j].setEnabled(false);
-                      botones[i][j].setText(String.valueOf(matrizEstado[i][j]));
+                    botones[i][j].setEnabled(false);
+                    botones[i][j].setText(String.valueOf(matrizEstado[i][j]));
+                    botones[i][j].setBackgroundColor(Color.WHITE);
                   }
             }
         }
@@ -362,7 +373,16 @@ public class Game extends AppCompatActivity {
     }
     ///////////////////////////////////////////////////////////////////
 
-
+    private void PrintMatrices(){
+        Log.d("MATRIZINICIAL","matrizInicial");
+        PrintMatrizInt(matrizInicial);
+        Log.d("MATRIZINICIAL","matrizEstado");
+        PrintMatrizInt(matrizEstado);
+        Log.d("MATRIZINICIAL","matrizSave");
+        PrintMatrizChar(matrizSavedMap);
+        Log.d("MATRIZINICIAL","matrizSucces");
+        PrintMatrizChar(matrizSucces);
+    }
     // Con proposito de debug
     private void PrintMatrizInt(int[][] m){
         String line ="";
